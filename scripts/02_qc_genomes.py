@@ -46,12 +46,19 @@ def assess_genome(fasta_path: Path) -> dict:
     gc_counts = []
     n_counts = []
 
-    for rec in SeqIO.parse(fasta_path, "fasta"):
-        seq = str(rec.seq).upper()
-        lengths.append(len(seq))
-        gc = seq.count("G") + seq.count("C")
-        gc_counts.append(gc)
-        n_counts.append(seq.count("N"))
+    try:
+        for rec in SeqIO.parse(fasta_path, "fasta"):
+            seq = str(rec.seq).upper()
+            lengths.append(len(seq))
+            gc = seq.count("G") + seq.count("C")
+            gc_counts.append(gc)
+            n_counts.append(seq.count("N"))
+    except TimeoutError as e:
+        logger.warning(f"Timeout while reading {fasta_path}: {e}")
+        return {"genome_id": fasta_path.stem, "error": "read_timeout"}
+    except OSError as e:
+        logger.warning(f"I/O error while reading {fasta_path}: {e}")
+        return {"genome_id": fasta_path.stem, "error": "read_error"}
 
     if not lengths:
         return {"genome_id": fasta_path.stem, "error": "empty_file"}
@@ -99,7 +106,8 @@ def apply_filters(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 r.append(f"low_gc({row['gc_content']:.3f})")
             if row["gc_content"] > qc["max_gc"]:
                 r.append(f"high_gc({row['gc_content']:.3f})")
-        reasons.append("; ".join(r) if r else "")
+        # Ensure all reasons are strings and skip nulls
+        reasons.append("; ".join(str(reason) for reason in r if pd.notna(reason)) if r else "")
 
     df = df.copy()
     df["fail_reason"] = reasons

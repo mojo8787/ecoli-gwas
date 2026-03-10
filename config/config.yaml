@@ -11,8 +11,8 @@ bvbrc:
 # --- Cohort ---
 cohort:
   target_genomes: 200                    # Max genomes to download
-  use_bvbrc_pa_matrix: true             # true = fast path (BV-BRC plfam API)
-                                         # false = slow path (Prokka + Panaroo)
+  use_bvbrc_pa_matrix: false            # true = fast path (BV-BRC plfam API)
+                                        # false = slow path (Prokka + Panaroo)
 
 # --- QC thresholds ---
 qc:

@@ -1,10 +1,8 @@
 {
   "creators": [
     {
-      "name": "Your Name",
-      "affiliation": "Your Institution",
-      "orcid": "0000-0000-0000-0000",
-      "type": "ContactPerson"
+      "name": "Younis, Almtoasem Bellah",
+      "affiliation": "Independent researcher, Brno, Czech Republic"
     }
   ],
   "title": "E. coli GWAS Pipeline",

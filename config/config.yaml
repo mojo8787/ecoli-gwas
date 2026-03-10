@@ -1,0 +1,70 @@
+# ============================================================
+# E. coli GWAS Configuration
+# ============================================================
+
+# --- Data source ---
+bvbrc:
+  base_url: "https://www.bv-brc.org/api"
+  taxon_id: 562                          # E. coli
+  batch_size: 5000                       # Records per API page
+
+# --- Cohort ---
+cohort:
+  target_genomes: 200                    # Max genomes to download
+  use_bvbrc_pa_matrix: true             # true = fast path (BV-BRC plfam API)
+                                         # false = slow path (Prokka + Panaroo)
+
+# --- QC thresholds ---
+qc:
+  min_length: 4000000                    # bp
+  max_length: 6500000                    # bp
+  max_contigs: 500
+  min_n50: 10000                         # bp
+  min_gc: 0.48
+  max_gc: 0.53
+
+# --- Phenotypes ---
+phenotypes:
+  min_resistant: 20                      # Minimum R samples per antibiotic
+  min_susceptible: 20                    # Minimum S samples per antibiotic
+  # Antibiotics of interest (leave empty [] to auto-select all eligible)
+  antibiotics_of_interest:
+    - ciprofloxacin
+    - ampicillin
+    - tetracycline
+    - trimethoprim
+    - ceftriaxone
+    - meropenem
+    - gentamicin
+    - chloramphenicol
+
+# --- GWAS ---
+gwas:
+  significance_alpha: 0.05              # For Bonferroni correction
+  suggestive_threshold: 1.0e-5
+  min_af: 0.01                          # Minimum allele frequency
+  max_af: 0.99                          # Maximum allele frequency (filter fixed variants)
+  lmm: true                             # Use LMM (recommended for E. coli)
+
+# --- Compute ---
+compute:
+  prokka_jobs: 4                         # Parallel Prokka jobs
+  prokka_cpus_per_job: 2                 # CPUs per Prokka job
+  panaroo_threads: 8
+  pyseer_cpus: 8
+  python_jobs: 4                         # joblib parallel jobs
+
+# --- Paths (relative to project root) ---
+paths:
+  raw_genomes: "data/raw/genomes"
+  raw_amr: "data/raw/amr"
+  qc_report: "data/processed/qc/qc_report.tsv"
+  passing_genomes: "data/processed/qc/passing_genomes.txt"
+  phenotype_matrix: "data/processed/phenotypes/phenotype_matrix.tsv"
+  gene_pa_matrix: "data/processed/pangenome/gene_pa_matrix.tsv"
+  prokka_dir: "data/processed/pangenome/prokka"
+  panaroo_dir: "data/processed/pangenome/panaroo"
+  gwas_inputs: "data/gwas/inputs"
+  gwas_results: "data/gwas/results"
+  figures: "results/figures"
+  logs: "logs"

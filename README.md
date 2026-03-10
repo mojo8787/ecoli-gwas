@@ -141,7 +141,7 @@ Genomes and AMR phenotypes are fetched from the **BV-BRC** (Bacterial and Viral 
 If you use this pipeline in your research, please cite the software and the Zenodo archive (DOI will appear after your first release):
 
 - **Software**: See [CITATION.cff](CITATION.cff) or the "Cite this repository" widget on GitHub.
-- **Zenodo**: After connecting this repo to [Zenodo](https://zenodo.org) and creating a release, a DOI will be assigned. Update the badge above with your DOI (replace `XXXXXXX`).
+- **Zenodo**: After connecting this repo to [Zenodo](https://zenodo.org) and creating a release, a DOI will be assigned. Update the badge above with your DOI (replace `XXXXXXX`). To enable: sign in at [Zenodo](https://zenodo.org) → GitHub → enable **ecoli-gwas** → create a release; Zenodo will archive it and assign a DOI.
 
 ---
 

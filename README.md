@@ -1,6 +1,6 @@
 # E. coli GWAS Pipeline
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18968216.svg)](https://doi.org/10.5281/zenodo.18968216)
 
 A fully automated pipeline for performing Genome-Wide Association Studies (GWAS) on *Escherichia coli* to identify genomic loci (genes) associated with antibiotic resistance.
 
@@ -225,10 +225,10 @@ Genomes and AMR phenotypes are fetched from the **BV-BRC** (Bacterial and Viral 
 
 ## Citation
 
-If you use this pipeline in your research, please cite the software and the Zenodo archive (DOI will appear after your first release):
+If you use this pipeline in your research, please cite the software and the Zenodo archive:
 
 - **Software**: See [CITATION.cff](CITATION.cff) or the "Cite this repository" widget on GitHub.
-- **Zenodo**: After connecting this repo to [Zenodo](https://zenodo.org) and creating a release, a DOI will be assigned. Update the badge above with your DOI (replace `XXXXXXX`). To enable: sign in at [Zenodo](https://zenodo.org) → GitHub → enable **ecoli-gwas** → create a release; Zenodo will archive it and assign a DOI.
+- **Zenodo**: `Younis, A. B. (2026). E. coli GWAS Pipeline (Version 1.0.2) [Software]. Zenodo. https://doi.org/10.5281/zenodo.18968216.`
 
 Reproducibility is supported through standard practice: a machine-readable citation (CITATION.cff), pinned dependencies (`requirements.txt`, `environment.yml`), and a single configuration file (`config/config.yaml`) so runs can be repeated and verified.
 

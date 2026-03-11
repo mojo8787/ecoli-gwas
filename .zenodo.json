@@ -7,7 +7,7 @@
   ],
   "title": "E. coli GWAS Pipeline",
   "description": "A fully automated pipeline for Genome-Wide Association Studies (GWAS) on Escherichia coli to identify genomic loci associated with antibiotic resistance. Downloads genomes and AMR phenotypes from BV-BRC, runs QC, builds a pangenome presence/absence matrix, and uses pyseer with a Linear Mixed Model for population structure correction.",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "access_right": "open",
   "license": "mit",
   "upload_type": "software",
@@ -25,7 +25,7 @@
   "related_identifiers": [
     {
       "identifier": "https://www.bv-brc.org/",
-      "relation": "uses",
+      "relation": "references",
       "resource_type": "other"
     }
   ]

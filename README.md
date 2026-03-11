@@ -6,6 +6,60 @@ A fully automated pipeline for performing Genome-Wide Association Studies (GWAS)
 
 **Intended use:** At default settings (200 genomes, gene presence/absence input), this pipeline is suited for **demonstration and teaching**—it shows the full workflow from BV-BRC data to pyseer LMM and visualisation. For publication-grade or hypothesis-driven GWAS, see [Methodological considerations](#methodological-considerations-current-vs-production) below.
 
+---
+
+## Results (v1.0.0 run — 200 genomes, 8 antibiotics)
+
+### Resistance prevalence across antibiotics
+
+![Resistance heatmap](docs/figures/heatmap_resistance.png)
+
+*Binary resistance heatmap across 200 E. coli genomes and 8 antibiotics. Each cell = resistant (1) or susceptible (0).*
+
+---
+
+### Manhattan plots — significant gene associations
+
+**Ampicillin** — strongest hit: `PLF_561_00004782` at p = 8×10⁻⁴⁵ (likely β-lactamase)
+
+![Manhattan ampicillin](docs/figures/manhattan_ampicillin.png)
+
+**Ceftriaxone** — 23 significant hits, top hit `PLF_561_00008661` at p = 3×10⁻²¹
+
+![Manhattan ceftriaxone](docs/figures/manhattan_ceftriaxone.png)
+
+**Trimethoprim** — 15 significant hits, top hit `PLF_561_00005659` at p = 3×10⁻²⁴
+
+![Manhattan trimethoprim](docs/figures/manhattan_trimethoprim.png)
+
+---
+
+### QQ plot — model calibration
+
+![QQ ampicillin](docs/figures/qq_ampicillin.png)
+
+*QQ plot for ampicillin. Inflation at the tail indicates real signal; the LMM population structure correction keeps the bulk of the distribution on the null line.*
+
+---
+
+### Summary of significant hits
+
+| Antibiotic | Significant hits (Bonferroni p < 3.88×10⁻⁶) |
+|------------|----------------------------------------------|
+| Ampicillin | 4 |
+| Ceftriaxone | 23 |
+| Chloramphenicol | 18 |
+| Ciprofloxacin | 3 |
+| Gentamicin | 17 |
+| Meropenem | 26 |
+| Tetracycline | 12 |
+| Trimethoprim | 15 |
+| **Total** | **118** |
+
+Full results in [`data/gwas/results/all_significant_hits.tsv`](data/gwas/results/) after running the pipeline.
+
+---
+
 ## What it does
 
 This pipeline downloads publicly available *E. coli* genomes and AMR (antimicrobial resistance) phenotypes from the [BV-BRC database](https://www.bv-brc.org/), runs quality control, builds a pangenome presence/absence matrix, and uses **pyseer** with a Linear Mixed Model (LMM) to correct for population structure while identifying resistance-associated genes. Results are visualised as Manhattan plots, QQ plots, and a resistance heatmap.

@@ -1,6 +1,8 @@
 # E. coli GWAS Pipeline
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18968216.svg)](https://doi.org/10.5281/zenodo.18968216)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 
 A fully automated pipeline for performing Genome-Wide Association Studies (GWAS) on *Escherichia coli* to identify genomic loci (genes) associated with antibiotic resistance.
 

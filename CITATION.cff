@@ -1,13 +1,14 @@
 cff-version: 1.2.0
 title: E. coli GWAS Pipeline
-version: 1.0.0
-date-released: 2026-03-10
+version: 1.0.1
+date-released: 2026-03-11
 type: software
 authors:
-  - given-names: "Almtoasem Bellah"
+  - given-names: "Almotasem Bellah"
     family-names: "Younis"
-    affiliation: "Independent researcher, Brno, Czech Republic"
-url: https://github.com/mojo8787/ecoli-gwas
+    affiliation: "Mendel University Brno, Czech Republic"
+    post-nominal-letters: "PhD"
+    orcid: "https://orcid.org/0000-0003-2070-2811"
 repository-code: https://github.com/mojo8787/ecoli-gwas
 license: MIT
 keywords:
@@ -22,4 +23,5 @@ keywords:
 abstract: >
   A fully automated pipeline for Genome-Wide Association Studies (GWAS)
   on Escherichia coli to identify genomic loci associated with antibiotic
-  resistance. Uses BV-BRC data, QC, pangenome presence/absence, and pyseer LMM.
+  resistance. Integrates BV-BRC data, QC, pangenome presence/absence,
+  and pyseer LMM for population-structure-corrected association testing.

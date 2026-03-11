@@ -100,7 +100,7 @@ def main():
     valid = [(gid, p) for gid, p in zip(genome_ids, fasta_paths) if p.exists()]
     logger.info(f"Annotating {len(valid)} genomes...")
 
-    results = Parallel(n_jobs=n_jobs, prefer="processes")(
+    results = Parallel(n_jobs=n_jobs, prefer="threads")(
         delayed(run_prokka)(gid, fasta, prokka_dir, cpus_per_job, log_dir)
         for gid, fasta in tqdm(valid, desc="Prokka")
     )

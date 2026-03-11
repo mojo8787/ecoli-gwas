@@ -40,9 +40,19 @@ def load_passing_genomes(cfg: dict) -> list:
     return path.read_text().strip().splitlines()
 
 
+def find_tool(name: str) -> str | None:
+    """Find a tool, preferring the venv bin directory alongside this Python."""
+    venv_bin = Path(sys.executable).parent / name
+    if venv_bin.exists():
+        return str(venv_bin)
+    result = subprocess.run(["which", name], capture_output=True, text=True)
+    if result.returncode == 0:
+        return result.stdout.strip()
+    return None
+
+
 def check_tool(name: str) -> bool:
-    result = subprocess.run(["which", name], capture_output=True)
-    return result.returncode == 0
+    return find_tool(name) is not None
 
 
 # ── Step 1: Mash distances ────────────────────────────────────────────────────
@@ -148,8 +158,9 @@ def count_patterns(pa_path: Path, pheno_path: Path, gwas_inputs: Path) -> int:
 
     if result.returncode != 0:
         logger.warning(f"count_patterns failed: {result.stderr}. Using total feature count.")
+        # pa_path is Rtab: rows=genes, columns=samples → shape[0] = number of genes
         pa = pd.read_csv(pa_path, sep="\t", index_col=0)
-        return pa.shape[1]
+        return pa.shape[0]
 
     with open(pattern_file) as f:
         for line in f:
@@ -160,7 +171,7 @@ def count_patterns(pa_path: Path, pheno_path: Path, gwas_inputs: Path) -> int:
                     pass
 
     pa = pd.read_csv(pa_path, sep="\t", index_col=0)
-    return pa.shape[1]
+    return pa.shape[0]
 
 
 # ── Step 3: Run pyseer per antibiotic ────────────────────────────────────────
@@ -188,8 +199,9 @@ def run_pyseer_for_antibiotic(
     use_lmm = cfg["gwas"]["lmm"]
     cpus = cfg["compute"]["pyseer_cpus"]
 
+    pyseer_bin = find_tool("pyseer")
     cmd = [
-        "pyseer",
+        pyseer_bin,
         "--lmm" if use_lmm else "--linear",
         "--phenotypes", str(pheno_path),
         "--phenotype-column", antibiotic,
@@ -236,15 +248,26 @@ def main():
     setup_logging(cfg)
     logger.info("=== Step 6: Run GWAS ===")
 
-    pa_path = ROOT / cfg["paths"]["gene_pa_matrix"]
+    pa_matrix_path = ROOT / cfg["paths"]["gene_pa_matrix"]
     pheno_path = ROOT / cfg["paths"]["phenotype_matrix"]
     gwas_results_dir = ROOT / cfg["paths"]["gwas_results"]
     gwas_results_dir.mkdir(parents=True, exist_ok=True)
     gwas_inputs = ROOT / cfg["paths"]["gwas_inputs"]
 
-    if not pa_path.exists():
-        logger.error(f"Gene PA matrix not found: {pa_path}. Run 04_build_pa_matrix.py first.")
+    if not pa_matrix_path.exists():
+        logger.error(f"Gene PA matrix not found: {pa_matrix_path}. Run 04_build_pa_matrix.py first.")
         return
+
+    # pyseer --pres requires Rtab format: rows=genes, columns=samples, header "Gene\tsample1\tsample2..."
+    # gene_pa_matrix.tsv is transposed (rows=samples, columns=genes), so we transpose it.
+    pa_path = gwas_inputs / "gene_pa_rtab.tsv"
+    if not pa_path.exists():
+        logger.info("Transposing gene PA matrix to Rtab format for pyseer...")
+        pa_df = pd.read_csv(pa_matrix_path, sep="\t", index_col=0)
+        rtab = pa_df.T
+        rtab.index.name = "Gene"
+        rtab.to_csv(pa_path, sep="\t")
+        logger.info(f"Rtab file written: {pa_path}")
     if not pheno_path.exists():
         logger.error(f"Phenotype matrix not found: {pheno_path}. Run 03_prepare_phenotypes.py first.")
         return
@@ -260,7 +283,7 @@ def main():
         logger.warning("mash not found — using fallback similarity matrix from gene PA matrix")
         sim_path = build_python_similarity(cfg)
 
-    # Bonferroni threshold
+    # Bonferroni threshold (count_patterns also needs the Rtab file)
     n_patterns = count_patterns(pa_path, pheno_path, gwas_inputs)
     alpha = cfg["gwas"]["significance_alpha"]
     threshold = alpha / max(n_patterns, 1)

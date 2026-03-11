@@ -50,35 +50,33 @@ def load_passing_genomes(cfg: dict) -> list:
 # ── Fast path: BV-BRC plfam API ──────────────────────────────────────────────
 
 def fetch_plfam_batch(genome_ids: list, base_url: str) -> pd.DataFrame:
-    """Fetch plfam_id assignments for a batch of genome IDs."""
-    ids_str = ",".join(genome_ids)
-    url = f"{base_url}/genome_feature/"
-    params = {
-        "in(genome_id,({ids}))".format(ids=ids_str): "",
-        "eq(annotation,PATRIC)": "",
-        "eq(feature_type,CDS)": "",
-        "select": "genome_id,plfam_id",
-        "limit": 200000,
-    }
-
-    for attempt in range(5):
-        try:
-            resp = requests.get(url, params=params, headers=HEADERS, timeout=120)
-            resp.raise_for_status()
-            data = resp.json()
-            return pd.DataFrame(data)
-        except Exception as e:
-            if attempt == 4:
-                raise
-            wait = 2 ** attempt
-            logger.warning(f"Retry {attempt+1}/5: {e}. Waiting {wait}s")
-            time.sleep(wait)
+    """Fetch plfam_id assignments (one API call per genome). BV-BRC expects params without trailing =."""
+    all_dfs = []
+    for gid in genome_ids:
+        # Build query string without trailing = so API returns 200
+        q = f"eq(genome_id,{gid})&eq(annotation,PATRIC)&eq(feature_type,CDS)&select(genome_id,plfam_id)&limit(200000)"
+        url = f"{base_url}/genome_feature/?{q}"
+        for attempt in range(5):
+            try:
+                resp = requests.get(url, headers=HEADERS, timeout=120)
+                resp.raise_for_status()
+                data = resp.json()
+                all_dfs.append(pd.DataFrame(data))
+                break
+            except Exception as e:
+                if attempt == 4:
+                    raise
+                wait = 2 ** attempt
+                logger.warning(f"Retry {attempt+1}/5 for {gid}: {e}. Waiting {wait}s")
+                time.sleep(wait)
+        time.sleep(0.05)
+    return pd.concat(all_dfs, ignore_index=True)
 
 
 def build_pa_matrix_from_bvbrc(genome_ids: list, cfg: dict) -> pd.DataFrame:
     """Download plfam assignments and pivot to presence/absence matrix."""
     base_url = cfg["bvbrc"]["base_url"]
-    batch_size = 50  # BV-BRC URL length limit: ~50 genome IDs per request
+    batch_size = 15  # Small batches to avoid 400 from long URLs
 
     all_records = []
     batches = [genome_ids[i:i+batch_size] for i in range(0, len(genome_ids), batch_size)]
